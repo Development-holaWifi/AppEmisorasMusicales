@@ -1,4 +1,3 @@
-import {ActivityIndicator} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {
   Text,
@@ -6,6 +5,7 @@ import {
   ScrollView,
   useWindowDimensions,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import {RootStackParams} from '../../navigation/Navigation';
 import {useEffect, useState} from 'react';
@@ -13,16 +13,13 @@ import {useRadioNowPlaying} from '../../hooks/useRadioNowPlaying';
 import {getImg} from '../../components/song/UrlExists';
 import {EmisorasCarousel} from '../../components/emisoras/EmisorasCarousel';
 import {emisorasData} from '../../../api/EmisorasData';
-import PruebaPlayer from '../../components/setup-player/PruebaPlayer';
 import {TopMenu} from '../../components/top-menu/TopMenu';
 import Gradient from '../../components/gradient/Gradient';
 
 interface Props extends StackScreenProps<RootStackParams, 'Details'> {}
 
-export const DetailsScreen = ({route, navigation}: Props) => {
+export const DetailsScreen = ({route}: Props) => {
   const {id} = route.params;
-  console.log('Emisora actual:', id); // 🔍 Debugging para ver si el ID cambia
-
   const {songData, station} = useRadioNowPlaying(id);
   const [stream, setStream] = useState<string>('');
   const [poster, setPoster] = useState<string | null>(null);
@@ -42,27 +39,27 @@ export const DetailsScreen = ({route, navigation}: Props) => {
 
   const emisora = emisorasData.find(e => e.id === id);
   const mainColor = emisora?.color || '#CF70B1';
+  const radioPortada = emisora?.image;
 
-  // 🔥 Se reinicia todo cada vez que cambia el ID
   useEffect(() => {
     setLoading(true);
-    setStream('');
-    setPoster(null);
-    setSong(null);
+    if (songData?.artist) {
+      getPoster(songData.artist);
+      setSong({artist: songData.artist, song: songData.title});
+    }
+  }, [songData, id]);
 
+  useEffect(() => {
     if (station) {
       setStream(station.listen_url);
     }
+  }, [station?.listen_url, id]);
 
-    if (songData?.artist) {
-      setSong({artist: songData.artist, song: songData.title});
-      getImg(songData.artist)
-        .then(setPoster)
-        .catch(() => setPoster(null));
+  useEffect(() => {
+    if (songData && station) {
+      setLoading(false);
     }
-
-    setLoading(false);
-  }, [id, songData, station]);
+  }, [songData, station]);
 
   const {height: screenHeight} = useWindowDimensions();
 
@@ -82,11 +79,11 @@ export const DetailsScreen = ({route, navigation}: Props) => {
             songData={song}
             name={station?.name}
             color={mainColor}
+            radioPortada={radioPortada}
           />
         )}
       </View>
       <EmisorasCarousel />
-      {stream ? <PruebaPlayer url={stream} /> : null}
     </ScrollView>
   );
 };

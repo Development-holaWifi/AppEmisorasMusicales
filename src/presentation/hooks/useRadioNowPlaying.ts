@@ -26,15 +26,22 @@ export const useRadioNowPlaying = (id: number) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isFetching = false;
+
     const getRadioStation = async () => {
+      if (isFetching) return;
+      isFetching = true;
       setLoading(true);
       setError(null);
       try {
         const res = await axios.get<RadioMetaData>(
           `https://stream.emisorasmusicales.net/api/nowplaying/${id}`,
+          {signal: controller.signal},
         );
         const currentSong = res.data.now_playing.song;
         const curreStation = res.data.station;
+
         if (
           !songData ||
           currentSong.title !== songData.title ||
@@ -42,14 +49,20 @@ export const useRadioNowPlaying = (id: number) => {
         ) {
           setSongData(currentSong);
         }
-
-        setSongData(currentSong);
-        setStation(curreStation);
+        if (
+          !station ||
+          curreStation.listen_url !== station.listen_url ||
+          curreStation.name !== station.name
+        ) {
+          setStation(curreStation);
+        }
       } catch (err) {
+        if (axios.isCancel(err)) return;
         setError('Error al obtener la señal de Radio');
         console.log(err);
       } finally {
         setLoading(false);
+        isFetching = false;
       }
     };
 
@@ -57,11 +70,11 @@ export const useRadioNowPlaying = (id: number) => {
 
     const intervalId = setInterval(() => {
       getRadioStation();
-    }, 15000);
+    }, 30000);
 
-    // Limpiar el intervalo cuando el componente se desmonta
     return () => {
       clearInterval(intervalId);
+      controller.abort();
     };
   }, [id]);
 

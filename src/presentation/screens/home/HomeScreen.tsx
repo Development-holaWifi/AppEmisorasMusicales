@@ -1,25 +1,16 @@
-import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import {PosterSong} from '../../components/song/PosterSong';
+import {ScrollView, StyleSheet, useWindowDimensions, View} from 'react-native';
 import {EmisorasCarousel} from '../../components/emisoras/EmisorasCarousel';
 import {useRadioNowPlaying} from '../../hooks/useRadioNowPlaying';
 import {useEffect, useState} from 'react';
 import {getImg} from '../../components/song/UrlExists';
-import PruebaPlayer from '../../components/setup-player/PruebaPlayer';
-import TrackPlayer from 'react-native-track-player';
 import {TopMenu} from '../../components/top-menu/TopMenu';
-import {BottomMenu} from '../../components/bottom-menu/BottomMenu';
-import Icon from '@react-native-vector-icons/ionicons';
 import Gradient from '../../components/gradient/Gradient';
-// import {MusicPlayer} from '../../components/setup-player/MusicPlayer';
+import {StackScreenProps} from '@react-navigation/stack';
+import {RootStackParams} from '../../navigation/Navigation';
 
-export const HomeScreen = () => {
+interface Props extends StackScreenProps<RootStackParams, 'Home'> {}
+
+export const HomeScreen = ({navigation}: Props) => {
   const {songData, station} = useRadioNowPlaying(1);
 
   const [stream, setStream] = useState<string>('');
@@ -29,11 +20,11 @@ export const HomeScreen = () => {
   const getPoster = async (artist: string | undefined) => {
     if (!artist) return;
     try {
-      const posterUrl = await getImg(artist); // Obtener la imagen del artista
-      setPoster(posterUrl); // Establecer la portada
+      const posterUrl = await getImg(artist);
+      setPoster(posterUrl);
     } catch (error) {
       console.error('Error al cargar la imagen:', error);
-      setPoster(null); // En caso de error, establecer como null
+      setPoster(null);
     }
   };
 
@@ -51,18 +42,12 @@ export const HomeScreen = () => {
     console.log(stream);
   }, [station?.listen_url]);
 
-  useEffect(() => {
-    const setupPlayer = async () => {
-      await TrackPlayer.setupPlayer();
-    };
-    setupPlayer();
-  }, []);
   const {height: screenHeight} = useWindowDimensions();
 
   return (
     <ScrollView style={styles.container}>
       <TopMenu />
-      <View style={{height: screenHeight * 0.6}}>
+      <View style={{height: screenHeight * 0.68}}>
         <Gradient
           poster={poster}
           stream={stream}

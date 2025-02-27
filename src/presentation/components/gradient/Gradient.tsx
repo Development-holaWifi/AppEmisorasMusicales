@@ -1,11 +1,11 @@
 import LinearGradient from 'react-native-linear-gradient';
 import {PosterSong} from '../song/PosterSong';
-import {Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Image, ImageSourcePropType} from 'react-native';
 import PruebaPlayer from '../setup-player/PruebaPlayer';
 
 interface SongData {
-  artist: string;
-  song: string;
+  artist?: string;
+  song?: string;
 }
 
 interface Props {
@@ -14,9 +14,17 @@ interface Props {
   stream?: string;
   name?: string;
   color?: string;
+  radioPortada?: ImageSourcePropType;
 }
 
-const Gradient = ({poster, songData, stream, name, color}: Props) => {
+const Gradient = ({
+  poster,
+  songData,
+  stream,
+  name,
+  color,
+  radioPortada,
+}: Props) => {
   return (
     <LinearGradient
       colors={[`${color}`, '#202020']}
@@ -31,7 +39,17 @@ const Gradient = ({poster, songData, stream, name, color}: Props) => {
           <Text style={{color: 'white', fontSize: 15}}>{songData?.song}</Text>
         </View>
       </View>
-      {stream ? <PruebaPlayer url={stream} /> : null}
+      <View style={styles.player}>
+        <Image
+          style={styles.radioImg}
+          source={
+            radioPortada
+              ? radioPortada
+              : require('../../../assets/em-poster.png')
+          }
+        />
+        {stream ? <PruebaPlayer url={stream} /> : null}
+      </View>
     </LinearGradient>
   );
 };
@@ -52,6 +70,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '75%',
+  },
+  player: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioImg: {
+    position: 'absolute',
+    left: 50,
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
+    borderWidth: 2,
+    borderColor: 'white',
+    borderRadius: 25,
   },
 });
 
