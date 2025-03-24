@@ -15,10 +15,11 @@ import {EmisorasCarousel} from '../../components/emisoras/EmisorasCarousel';
 import {emisorasData} from '../../../api/EmisorasData';
 import {TopMenu} from '../../components/top-menu/TopMenu';
 import Gradient from '../../components/gradient/Gradient';
+import {BottomMenu} from '../../components/bottom-menu/BottomMenu';
 
 interface Props extends StackScreenProps<RootStackParams, 'Details'> {}
 
-export const DetailsScreen = ({route}: Props) => {
+export const DetailsScreen = ({route, navigation}: Props) => {
   const {id} = route.params;
   const {songData, station} = useRadioNowPlaying(id);
   const [stream, setStream] = useState<string>('');
@@ -64,27 +65,30 @@ export const DetailsScreen = ({route}: Props) => {
   const {height: screenHeight} = useWindowDimensions();
 
   return (
-    <ScrollView style={styles.container}>
+    <>
       <TopMenu />
-      <View style={{height: screenHeight * 0.6}}>
-        {loading ? (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#CF70B1" />
-            <Text style={styles.loaderText}>Cargando...</Text>
-          </View>
-        ) : (
-          <Gradient
-            poster={poster}
-            stream={stream}
-            songData={song}
-            name={station?.name}
-            color={mainColor}
-            radioPortada={radioPortada}
-          />
-        )}
-      </View>
-      <EmisorasCarousel />
-    </ScrollView>
+      <ScrollView style={styles.container}>
+        <View style={{height: screenHeight * 0.6}}>
+          {loading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="#CF70B1" />
+              <Text style={styles.loaderText}>Cargando...</Text>
+            </View>
+          ) : (
+            <Gradient
+              poster={poster}
+              stream={stream}
+              songData={song}
+              name={station?.name}
+              color={mainColor}
+              radioPortada={radioPortada}
+            />
+          )}
+        </View>
+        <EmisorasCarousel />
+      </ScrollView>
+      <BottomMenu navigation={navigation} route={route} />
+    </>
   );
 };
 

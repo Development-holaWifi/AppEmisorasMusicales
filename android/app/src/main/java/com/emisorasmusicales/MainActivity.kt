@@ -1,4 +1,4 @@
-package com.appemisorasmusicales
+package com.emisorasmusicales
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity

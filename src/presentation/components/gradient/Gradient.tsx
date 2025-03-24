@@ -39,17 +39,19 @@ const Gradient = ({
           <Text style={{color: 'white', fontSize: 15}}>{songData?.song}</Text>
         </View>
       </View>
-      <View style={styles.player}>
-        <Image
-          style={styles.radioImg}
-          source={
-            radioPortada
-              ? radioPortada
-              : require('../../../assets/em-poster.png')
-          }
-        />
-        {stream ? <PruebaPlayer url={stream} /> : null}
-      </View>
+      {stream && (
+        <View style={styles.player}>
+          <Image
+            style={styles.radioImg}
+            source={
+              radioPortada
+                ? radioPortada
+                : require('../../../assets/emisorasPortadas/activaFm.webp')
+            }
+          />
+          <PruebaPlayer url={stream} />
+        </View>
+      )}
     </LinearGradient>
   );
 };

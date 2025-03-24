@@ -3,14 +3,15 @@ import {EmisorasCarousel} from '../../components/emisoras/EmisorasCarousel';
 import {useRadioNowPlaying} from '../../hooks/useRadioNowPlaying';
 import {useEffect, useState} from 'react';
 import {getImg} from '../../components/song/UrlExists';
-import {TopMenu} from '../../components/top-menu/TopMenu';
 import Gradient from '../../components/gradient/Gradient';
+import {TopMenu} from '../../components/top-menu/TopMenu';
+import {BottomMenu} from '../../components/bottom-menu/BottomMenu';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParams} from '../../navigation/Navigation';
 
 interface Props extends StackScreenProps<RootStackParams, 'Home'> {}
 
-export const HomeScreen = ({navigation}: Props) => {
+export const HomeScreen = ({navigation, route}: Props) => {
   const {songData, station} = useRadioNowPlaying(1);
 
   const [stream, setStream] = useState<string>('');
@@ -39,25 +40,27 @@ export const HomeScreen = ({navigation}: Props) => {
     if (station) {
       setStream(station.listen_url);
     }
-    console.log(stream);
   }, [station?.listen_url]);
 
   const {height: screenHeight} = useWindowDimensions();
 
   return (
-    <ScrollView style={styles.container}>
+    <>
       <TopMenu />
-      <View style={{height: screenHeight * 0.68}}>
-        <Gradient
-          poster={poster}
-          stream={stream}
-          songData={song}
-          name={station?.name}
-          color="#ff0066"
-        />
-      </View>
-      <EmisorasCarousel />
-    </ScrollView>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={{height: screenHeight * 0.68}}>
+          <Gradient
+            poster={poster}
+            stream={stream}
+            songData={song}
+            name={station?.name}
+            color="#ff0066"
+          />
+        </View>
+        <EmisorasCarousel />
+      </ScrollView>
+      <BottomMenu navigation={navigation} route={route} />
+    </>
   );
 };
 

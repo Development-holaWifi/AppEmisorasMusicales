@@ -1,11 +1,11 @@
 export const emisorasData = [
-  // {
-  //   id: 1,
-  //   image: require('../assets/emisorasPortadas/activaFm.webp'),
-  //   title: 'Activa FM',
-  //   description: 'descripcion de la emisora',
-  //   color: '#e73b3c',
-  // },
+  {
+    id: 1,
+    image: require('../assets/emisorasPortadas/activaFm.webp'),
+    title: 'Activa FM',
+    description: 'descripcion de la emisora',
+    color: '#e73b3c',
+  },
   {
     id: 4,
     image: require('../assets/emisorasPortadas/bikini.webp'),

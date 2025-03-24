@@ -1,9 +1,37 @@
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, Pressable, StyleSheet, Text, View} from 'react-native';
+import Icon from '@react-native-vector-icons/ionicons';
+import {NavigationProp} from '@react-navigation/native';
+import {RootStackParams} from '../../navigation/Navigation';
 
-export const BottomMenu = () => {
+interface Props {
+  navigation: NavigationProp<RootStackParams>;
+  route?: any;
+}
+
+export const BottomMenu = ({navigation, route}: Props) => {
   return (
     <View style={styles.container}>
-      <Text>bottom menu</Text>
+      <Pressable onPress={() => navigation.navigate('Home')}>
+        <Icon
+          name={route.name === 'Home' ? 'home-sharp' : 'home-outline'}
+          size={25}
+          color="white"
+        />
+      </Pressable>
+      <Pressable onPress={() => navigation.navigate('Search')}>
+        <Icon
+          name={route.name === 'Search' ? 'search-sharp' : 'search-outline'}
+          size={25}
+          color="white"
+        />
+      </Pressable>
+      <Pressable onPress={() => navigation.navigate('Favorites')}>
+        <Icon
+          name={route.name === 'Favorites' ? 'heart-sharp' : 'heart-outline'}
+          size={25}
+          color="white"
+        />
+      </Pressable>
     </View>
   );
 };
@@ -14,8 +42,12 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 0,
+    zIndex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     width: '100%',
-    height: height * 0.08,
+    height: height * 0.05,
     backgroundColor: '#FF0066',
   },
 });

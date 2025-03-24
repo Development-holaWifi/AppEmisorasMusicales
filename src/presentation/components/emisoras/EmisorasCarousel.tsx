@@ -29,7 +29,7 @@ export const EmisorasCarousel = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 90,
+    marginBottom: 60,
     paddingVertical: 10,
   },
   text: {

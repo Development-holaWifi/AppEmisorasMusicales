@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Navigation} from './presentation/navigation/Navigation';
 import {BottomMenu} from './presentation/components/bottom-menu/BottomMenu';
-import {useEffect} from 'react';
 import TrackPlayer from 'react-native-track-player';
 
 export const App = () => {
@@ -12,10 +12,10 @@ export const App = () => {
     };
     setupPlayer();
   }, []);
+
   return (
     <NavigationContainer>
       <Navigation />
-      <BottomMenu />
     </NavigationContainer>
   );
 };
