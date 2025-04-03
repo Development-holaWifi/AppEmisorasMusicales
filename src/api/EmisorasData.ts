@@ -2,6 +2,7 @@ export const emisorasData = [
   {
     id: 1,
     image: require('../assets/emisorasPortadas/activaFm.webp'),
+    background: require('../assets/backgrounds/back-activa.jpeg'),
     title: 'Activa FM',
     description: 'descripcion de la emisora',
     color: '#e73b3c',
@@ -9,6 +10,7 @@ export const emisorasData = [
   {
     id: 4,
     image: require('../assets/emisorasPortadas/bikini.webp'),
+    background: require('../assets/backgrounds/back-bikini.jpeg'),
     title: 'Bikini FM',
     description: 'descripcion de la emisora',
     color: '#66ccff',

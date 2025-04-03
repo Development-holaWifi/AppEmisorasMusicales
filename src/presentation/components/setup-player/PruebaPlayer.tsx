@@ -1,87 +1,72 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, TouchableOpacity, Text, Image} from 'react-native';
-import TrackPlayer, {usePlaybackState, State} from 'react-native-track-player';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import TrackPlayer, {
+  usePlaybackState,
+  State,
+  useTrackPlayerEvents,
+} from 'react-native-track-player';
 import Icon from '@react-native-vector-icons/ionicons';
 
 interface PruebaPlayerProps {
   url: string;
+  name?: string;
 }
 
-export const PruebaPlayer: React.FC<PruebaPlayerProps> = ({url}) => {
-  const playbackState = usePlaybackState(); // Hook para obtener el estado de reproducción
+export const PruebaPlayer: React.FC<PruebaPlayerProps> = ({url, name}) => {
+  const playbackState = usePlaybackState();
   const [initialized, setInitialized] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
-  // Configurar el reproductor solo una vez al montar el componente
   useEffect(() => {
-    const setupPlayer = async () => {
-      try {
-        // Obtener el estado de reproducción
-        const playbackState = await TrackPlayer.getPlaybackState();
-
-        // Comparamos playbackState.state con State.None
-        if (!playbackState.state) {
-          // Si el estado es "None", significa que el reproductor no está inicializado
-          await TrackPlayer.setupPlayer(); // Inicializamos el reproductor
-          setInitialized(true); // Marcamos como inicializado
-        } else {
-          setInitialized(true); // Si ya está en estado válido (Playing, Paused), lo marcamos como inicializado
-        }
-      } catch (error) {
-        console.error('Error initializing track player:', error);
+    const checkPlayer = async () => {
+      const state = await TrackPlayer.getPlaybackState();
+      if (state.state) {
+        setInitialized(true);
+        const activeTrack = await TrackPlayer.getActiveTrack();
+        if (activeTrack) setCurrentUrl(activeTrack.url);
       }
     };
+    checkPlayer();
+  }, []);
 
-    setupPlayer();
-
-    // Limpiar al desmontar el componente
-    return () => {
-      TrackPlayer.reset(); // Reseteamos el reproductor cuando el componente se desmonte
-    };
-  }, []); // Esta lógica solo se ejecuta una vez, cuando se monta el componente
-
-  // Manejo del cambio de URL de la estación
   useEffect(() => {
     const handleURLChange = async () => {
-      if (!initialized) return; // Si el reproductor no está inicializado, no hacemos nada
+      if (!initialized || !url || url === currentUrl) return;
 
-      // Resetear reproductor cuando cambie la URL
-      await TrackPlayer.reset();
-      await TrackPlayer.add({
-        id: 'radio-stream',
-        url: url,
-        title: 'Mi Radio',
-        artist: 'Live Stream',
-        artwork: 'https://example.com/logo.png',
-      });
+      const activeTrack = await TrackPlayer.getActiveTrack();
+      const state = await TrackPlayer.getPlaybackState();
 
-      // Pausar siempre que se cambie la emisora
-      await TrackPlayer.pause();
+      if (!activeTrack || activeTrack.url !== url) {
+        console.log('Cambio de URL necesario');
+        await TrackPlayer.reset();
+        await TrackPlayer.add({
+          id: 'radio-stream',
+          url,
+          title: name,
+          artist: 'Emisoras Musicales',
+        });
+        await TrackPlayer.play();
+        setCurrentUrl(url);
+      } else if (state.state !== State.Playing) {
+        console.log('Reanudando reproducción existente');
+        await TrackPlayer.play();
+      }
     };
-
     handleURLChange();
-  }, [url, initialized]); // Solo se ejecuta cuando cambia la URL y el reproductor está inicializado
+  }, [url, initialized]);
 
-  // Función para reproducir o pausar la radio
   const playPauseRadio = async () => {
-    if (!initialized) return; // No hacer nada si el reproductor no está inicializado
+    if (!initialized || playbackState.state === State.None) return; // Asegúrate de que el reproductor está listo
 
-    const activeTrack = await TrackPlayer.getActiveTrack();
-    if (!activeTrack) {
-      // Si no hay track activo, lo agregamos
-      await TrackPlayer.add({
-        id: 'radio-stream',
-        url: url,
-        title: 'Mi Radio',
-        artist: 'Live Stream',
-        artwork: 'https://example.com/logo.png',
-      });
-    }
+    const currentState = playbackState.state;
+    console.log('Acción manual, estado:', currentState);
 
-    // Verificamos el estado de reproducción y pausamos o reproducimos
-    if (playbackState?.state === State.Playing) {
+    if (currentState === State.Playing) {
       await TrackPlayer.pause();
+      console.log('Pausa manual');
     } else {
       await TrackPlayer.play();
+      console.log('Reproducción manual iniciada');
     }
   };
 
@@ -90,7 +75,7 @@ export const PruebaPlayer: React.FC<PruebaPlayerProps> = ({url}) => {
       <TouchableOpacity onPress={playPauseRadio}>
         <Icon
           name={
-            playbackState?.state === State.Playing
+            playbackState.state === State.Playing
               ? 'pause-outline'
               : 'play-outline'
           }
@@ -98,9 +83,6 @@ export const PruebaPlayer: React.FC<PruebaPlayerProps> = ({url}) => {
           color="white"
         />
       </TouchableOpacity>
-      {/* <Text>
-        <Icon name="radio-outline" color="white" size={40} />
-      </Text> */}
     </View>
   );
 };

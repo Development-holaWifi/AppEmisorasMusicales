@@ -1,18 +1,11 @@
 import axios from 'axios';
 import {useEffect, useState} from 'react';
-
-interface Song {
-  artist: string;
-  title: string;
-}
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface RadioMetaData {
   station: {
     listen_url: string;
     name: string;
-  };
-  now_playing: {
-    song: Song;
   };
 }
 
@@ -21,17 +14,13 @@ export const useRadioNowPlaying = (id: number) => {
     listen_url: string;
     name: string;
   } | null>(null);
-  const [songData, setSongData] = useState<Song | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
-    let isFetching = false;
 
-    const getRadioStation = async () => {
-      if (isFetching) return;
-      isFetching = true;
+    const fetchRadioStation = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -39,44 +28,50 @@ export const useRadioNowPlaying = (id: number) => {
           `https://stream.emisorasmusicales.net/api/nowplaying/${id}`,
           {signal: controller.signal},
         );
-        const currentSong = res.data.now_playing.song;
-        const curreStation = res.data.station;
+        const currentStation = res.data.station;
 
+        // Solo actualizar si la URL o nombre cambian
         if (
-          !songData ||
-          currentSong.title !== songData.title ||
-          currentSong.artist !== songData.artist
+          station?.listen_url !== currentStation.listen_url ||
+          station?.name !== currentStation.name
         ) {
-          setSongData(currentSong);
-        }
-        if (
-          !station ||
-          curreStation.listen_url !== station.listen_url ||
-          curreStation.name !== station.name
-        ) {
-          setStation(curreStation);
+          setStation(currentStation);
+          await AsyncStorage.setItem(
+            `station_${id}`,
+            JSON.stringify(currentStation),
+          );
         }
       } catch (err) {
-        if (axios.isCancel(err)) return;
-        setError('Error al obtener la señal de Radio');
-        console.log(err);
+        if (!axios.isCancel(err)) {
+          setError('Error al obtener la señal de Radio');
+          console.error(err);
+          const storedStation = await AsyncStorage.getItem(`station_${id}`);
+          if (storedStation) {
+            setStation(JSON.parse(storedStation));
+          }
+        }
       } finally {
         setLoading(false);
-        isFetching = false;
       }
     };
 
-    getRadioStation();
+    const loadStoredStation = async () => {
+      const storedStation = await AsyncStorage.getItem(`station_${id}`);
+      if (storedStation) {
+        setStation(JSON.parse(storedStation));
+        setLoading(false);
+        fetchRadioStation(); // Actualizar en segundo plano
+      } else {
+        fetchRadioStation();
+      }
+    };
 
-    const intervalId = setInterval(() => {
-      getRadioStation();
-    }, 30000);
+    loadStoredStation();
 
     return () => {
-      clearInterval(intervalId);
       controller.abort();
     };
   }, [id]);
 
-  return {station, songData, loading, error};
+  return {station, loading, error};
 };
