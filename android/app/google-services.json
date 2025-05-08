@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "773027500987",
+    "project_id": "comprovar-v",
+    "storage_bucket": "comprovar-v.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:773027500987:android:d9dba923be49953602ea9e",
+        "android_client_info": {
+          "package_name": "com.emisorasmusicales"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJcOG_g_JoX8EIIDDE3GkWhBugnT4mCJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

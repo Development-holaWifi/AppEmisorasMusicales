@@ -18,10 +18,10 @@ export const App = () => {
         await TrackPlayer.updateOptions({
           capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
           compactCapabilities: [Capability.Play, Capability.Pause],
-          notificationCapabilities: [Capability.Play, Capability.Pause],
+          notificationCapabilities: [Capability.Play, Capability.Pause, Capability.Stop],
           android: {
             appKilledPlaybackBehavior:
-              AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+              AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
           },
         });
       } catch (error) {
@@ -32,6 +32,7 @@ export const App = () => {
   }, []);
 
   return (
+
     <NavigationContainer>
       <Navigation />
     </NavigationContainer>

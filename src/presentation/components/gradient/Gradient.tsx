@@ -1,13 +1,13 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
-  Text,
   View,
   StyleSheet,
-  Image,
   ImageBackground,
   ImageSourcePropType,
+  Animated,
 } from 'react-native';
 import PruebaPlayer from '../setup-player/PruebaPlayer'; // Ajusta la ruta
+import Icon from '@react-native-vector-icons/ionicons';
 
 interface Props {
   stream?: string;
@@ -17,31 +17,44 @@ interface Props {
 }
 
 const Gradient = ({stream, name, radioPortada, back}: Props) => {
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (stream) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(fadeAnim, {
+            toValue: 0.2, // Opacidad mínima
+            duration: 500, // Medio segundo
+            useNativeDriver: true,
+          }),
+          Animated.timing(fadeAnim, {
+            toValue: 1, // Opacidad máxima
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    }
+  }, [stream]);
+
   return (
     <ImageBackground source={back} style={styles.background} resizeMode="cover">
-      <View>
-        <Image
-          style={styles.radioPortada}
-          source={
-            radioPortada
-              ? radioPortada
-              : require('../../../assets/emisorasPortadas/activaFm.webp')
-          }
-        />
-      </View>
-      {/* <Text style={styles.text}>Estás escuchando {name || 'una emisora'}</Text> */}
+      <View></View>
 
       {stream && (
         <View style={styles.player}>
-          <Image
-            style={styles.radioImg}
-            source={
-              radioPortada
-                ? radioPortada
-                : require('../../../assets/emisorasPortadas/activaFm.webp')
-            }
-          />
-          <PruebaPlayer url={stream} name={name} />
+          <Animated.View style={[styles.iconContainer, {opacity: fadeAnim}]}>
+            <Icon name={'radio-outline'} size={30} color="white" />
+          </Animated.View>
+
+          <View style={styles.playerContainer}>
+            <PruebaPlayer url={stream} name={name} />
+          </View>
+
+          <View style={styles.iconContainer}>
+            <Icon name="heart-outline" size={30} color="white" />
+          </View>
         </View>
       )}
     </ImageBackground>
@@ -50,23 +63,25 @@ const Gradient = ({stream, name, radioPortada, back}: Props) => {
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1, // Asegura que la imagen de fondo cubra toda la pantalla
-    justifyContent: 'space-around', // Centra los elementos dentro del fondo
+    flex: 1,
+    justifyContent: 'space-around',
     alignItems: 'center',
     height: '100%',
   },
-  text: {
-    color: 'white',
-    fontSize: 24,
-    marginBottom: 20, // Ajusta el margen según sea necesario
-  },
-  songTitles: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '75%',
-  },
+
   player: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginTop: 200,
+  },
+  iconContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  playerContainer: {
+    flex: 2,
     alignItems: 'center',
   },
   radioPortada: {
@@ -75,16 +90,6 @@ const styles = StyleSheet.create({
     marginTop: 100,
     resizeMode: 'contain',
     borderRadius: 10,
-  },
-  radioImg: {
-    position: 'absolute',
-    left: 50,
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-    borderWidth: 2,
-    borderColor: 'white',
-    borderRadius: 25,
   },
 });
 

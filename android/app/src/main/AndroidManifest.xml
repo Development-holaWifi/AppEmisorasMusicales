@@ -20,7 +20,8 @@
 
   <service android:name="com.doublesymmetry.trackplayer.service.MusicService"
     android:foregroundServiceType="mediaPlayback"
-    android:exported="true"/>
+    android:exported="true"
+    />
 
       <activity
         android:name=".MainActivity"

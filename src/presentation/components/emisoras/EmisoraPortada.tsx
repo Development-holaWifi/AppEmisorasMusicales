@@ -4,6 +4,7 @@ import {
   ImageSourcePropType,
   Pressable,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {RootStackParams} from '../../navigation/Navigation';
@@ -29,8 +30,8 @@ export const EmisoraPortada: React.FC<Props> = ({id, image}) => {
 
 const styles = StyleSheet.create({
   img: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     marginHorizontal: 3,
     borderRadius: 5,
   },

@@ -13,14 +13,15 @@ import {useRadioNowPlaying} from '../../hooks/useRadioNowPlaying';
 import {EmisorasCarousel} from '../../components/emisoras/EmisorasCarousel';
 import {emisorasData} from '../../../api/EmisorasData';
 import {TopMenu} from '../../components/top-menu/TopMenu';
-import Gradient from '../../components/gradient/Gradient';
 import {BottomMenu} from '../../components/bottom-menu/BottomMenu';
+import {useDetailsStore} from '../../store/useDetailsStore';
+import {BackgroundRadio} from '../../components/background-radio/BackgroundRadio';
 
 interface Props extends StackScreenProps<RootStackParams, 'Details'> {}
 
 export const DetailsScreen = ({route, navigation}: Props) => {
   const {id} = route.params;
-  const {station, loading: stationLoading} = useRadioNowPlaying(id); // Usamos el loading del hook
+  const {station, loading} = useRadioNowPlaying(id);
   const [stream, setStream] = useState<string>('');
 
   const emisora = emisorasData.find(e => e.id === id);
@@ -34,6 +35,16 @@ export const DetailsScreen = ({route, navigation}: Props) => {
     }
   }, [station?.listen_url]);
 
+  const setLastId = useDetailsStore(state => state.setLastId);
+  const lastId = useDetailsStore(state => state.lastId);
+
+  useEffect(() => {
+    if (id === lastId) return;
+    if (id) {
+      setLastId(id);
+    }
+  }, [id]);
+
   const {height: screenHeight} = useWindowDimensions();
 
   return (
@@ -41,17 +52,17 @@ export const DetailsScreen = ({route, navigation}: Props) => {
       <TopMenu />
       <ScrollView style={styles.container}>
         <View style={{height: screenHeight * 0.68}}>
-          {stationLoading ? (
+          {loading ? (
             <View style={styles.loaderContainer}>
               <ActivityIndicator size="large" color={mainColor} />
-              <Text style={styles.loaderText}>Cargando...</Text>
             </View>
           ) : (
-            <Gradient
+            <BackgroundRadio
               stream={stream}
               name={station?.name}
               radioPortada={radioPortada}
               back={radioBack}
+              id={id}
             />
           )}
         </View>
